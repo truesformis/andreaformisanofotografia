@@ -6,6 +6,8 @@
     <title>Il Mio Portfolio Fotografico - Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <!-- Netlify Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
       .hero {
         background-image: url('images/AstrofotografiaLAGOSCAFFAIOLO.jpg');
@@ -62,10 +64,8 @@
         <section id="portfolio-preview" class="container section-padding">
             <h2>Ultimi Lavori</h2>
             <!-- Elfsight Instagram Feed | andreaformisano.ph -->
-<script src="https://static.elfsight.com/platform/platform.js" async></script>
-<div class="elfsight-app-020d8602-89f6-4cb2-bec5-2391f6689e72" data-elfsight-app-lazy></div>
-                </div>
-            </div>
+            <script src="https://static.elfsight.com/platform/platform.js" async></script>
+            <div class="elfsight-app-020d8602-89f6-4cb2-bec5-2391f6689e72" data-elfsight-app-lazy></div>
             <div style="text-align: center; margin-top: 30px;">
                 <a href="portfolio.html" class="btn-secondary">Vedi Tutto il Portfolio</a>
             </div>
@@ -78,7 +78,7 @@
                 <p>Sono un fotografo appassionato con un occhio per i dettagli e una dedizione a catturare la bellezza nel quotidiano e nei momenti speciali. La mia missione è tradurre emozioni e storie in immagini che parlano.</p>
                 <a href="bio.html" class="btn-secondary">Leggi di più su di me</a>
             </div>
-        </secstion>
+        </section>
 
         <section id="contact-cta" class="container section-padding">
             <h2>Hai un Progetto in Mente?</h2>
@@ -94,5 +94,17 @@
     </footer>
 
     <script src="js/script.js"></script>
+    <!-- Script di redirect per Netlify Identity -->
+    <script>
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", (user) => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
+    </script>
 </body>
 </html>
