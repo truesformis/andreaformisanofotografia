@@ -1,0 +1,65 @@
+<!-- File: contatti.html -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contatti - Il Mio Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <a href="index.html" class="logo">Andrea Formisano</a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="bio.html">Bio</a></li>
+        <li><a href="contatti.html" class="active">Contatti</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container section-padding">
+    <section id="contact-form-section" class="content-section">
+      <h1 class="page-title">Mettiamoci in Contatto</h1>
+      <p class="form-intro">Hai un'idea per un progetto, una domanda sui miei servizi o vuoi semplicemente salutarmi? Compila il modulo qui sotto o utilizza i miei contatti diretti. Risponderò il prima possibile!</p>
+
+      <form action="https://formspree.io/f/xanjwano" method="POST" class="contact-form">
+        <div class="form-group">
+          <label for="email">La tua email:</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="name">Il tuo nome (opzionale):</label>
+          <input type="text" id="name" name="name">
+        </div>
+        <div class="form-group">
+          <label for="subject">Oggetto (opzionale):</label>
+          <input type="text" id="subject" name="subject">
+        </div>
+        <div class="form-group">
+          <label for="message">Il tuo messaggio:</label>
+          <textarea id="message" name="message" rows="6" required></textarea>
+        </div>
+        <button type="submit" class="btn">Invia Messaggio</button>
+      </form>
+
+      <div class="contact-info">
+        <h3>Altri Modi per Contattarmi</h3>
+        <p><strong>Email:</strong> andreaformisano.fotografia@gmail.com</p>
+        <p><strong>Telefono:</strong> +39 3463500700</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; <span id="currentYear"></span> Andrea Formisano Fotografia. Tutti i diritti riservati.</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
