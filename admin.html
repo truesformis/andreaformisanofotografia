@@ -2,632 +2,151 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin – Gestione Immagini</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <title>Admin - Gestione Immagini</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: 'Montserrat', sans-serif; padding: 20px; }
-    #loginSection, #adminSection { max-width: 1000px; margin: 0 auto; }
-    #adminSection { display: none; }
-    form { background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 30px; }
-    label { display: block; margin-top: 10px; }
-    input[type="file"], select, input[type="password"], button {
-      width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;
-    }
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 10px; }
-    .gallery-item { 
-      position: relative; 
-      cursor: grab; 
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .gallery-item:active { cursor: grabbing; }
-    .gallery-item img { width: 100%; display: block; border-radius: 4px; }
-    
-    /* STILI DRAG AND DROP */
-    .gallery-item.dragging {
-      opacity: 0.5;
-      transform: rotate(5deg) scale(1.05);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      z-index: 1000;
-    }
-    .gallery-item.drag-over {
-      border: 3px dashed #007bff;
-      background: rgba(0,123,255,0.1);
-    }
-    .drag-handle {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      width: 30px;
-      height: 30px;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      font-size: 16px;
-      cursor: grab;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .gallery-item:hover .drag-handle {
-      opacity: 1;
-    }
-    
-    /* X sempre visibile sulle immagini dinamiche */
-    .admin-delete-x {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      width: 30px;
-      height: 30px;
-      background-color: red;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      line-height: 1;
-    }
-
-    /* NUOVI STILI PER SEZIONE RIMOZIONE */
-    .remove-section {
-      background: #f9f9f9;
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 30px;
-    }
-    .remove-list {
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 10px;
-      background: white;
-    }
-    .remove-item {
-      display: flex;
-      align-items: center;
-      padding: 8px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-    }
-    .remove-item:hover {
-      background: #f5f5f5;
-    }
-    .remove-item.selected {
-      background: #e3f2fd;
-    }
-    .remove-item input[type="checkbox"] {
-      margin-right: 10px;
-      width: auto;
-    }
-    .remove-item img {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-right: 10px;
-    }
-    .remove-info {
-      flex: 1;
-    }
-    .remove-filename {
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
-    .remove-category {
-      font-size: 12px;
-      color: #666;
-    }
-    .remove-type {
-      font-size: 11px;
-      color: #999;
-      font-style: italic;
-    }
-    #removeSelectedBtn {
-      background: #ff4444;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: not-allowed;
-      margin-top: 10px;
-      opacity: 0.5;
-      width: auto;
-    }
-    #removeSelectedBtn.active {
-      cursor: pointer;
-      opacity: 1;
-    }
-
-    /* MESSAGGIO DRAG AND DROP */
-    .drag-info {
-      background: #e3f2fd;
-      border: 1px solid #2196f3;
-      border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      color: #1976d2;
-    }
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    #login-section, #admin-section { max-width: 600px; margin: 0 auto; }
+    #gallery { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .img-item { position: relative; }
+    .img-item img { max-width: 150px; max-height: 150px; border: 1px solid #ccc; }
+    .remove-btn { position: absolute; top: 2px; right: 2px; background: #f00; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
+    .drag-over { border: 2px dashed #007bff; }
+    #upload-section { margin-top: 30px; padding: 20px; border: 1px solid #eee; border-radius: 8px; background: #fafafa; }
+    #img_url { width: 100%; margin-top: 10px; }
+    .preview { margin-top: 10px; }
+    .preview img { max-width: 200px; max-height: 200px; }
   </style>
 </head>
 <body>
+  <!-- Login Section -->
+  <div id="login-section">
+    <h2>Accesso Amministratore</h2>
+    <input type="password" id="admin-password" placeholder="Password">
+    <button onclick="checkPassword()">Entra</button>
+    <div id="login-error" style="color: red; display: none;">Password errata!</div>
+  </div>
 
-  <h1 style="text-align:center;">Area Admin</h1>
+  <!-- Admin Section -->
+  <div id="admin-section" style="display: none;">
+    <h1>Gestione Galleria Immagini</h1>
 
-  <section id="loginSection">
-    <form id="loginForm">
-      <label for="password">Inserisci password:</label>
-      <input type="password" id="password" required>
-      <button type="submit">Entra</button>
-    </form>
-  </section>
-
-  <section id="adminSection">
-    <form id="adminForm">
-      <h2>Aggiungi Nuove Immagini</h2>
-      <label for="fileInput">Seleziona o trascina immagini:</label>
-      <input type="file" id="fileInput" multiple accept="image/*">
-      <label for="category">Categoria:</label>
-      <select id="category">
-        <option value="Astrofotografia">Astrofotografia</option>
-        <option value="Viaggio">Viaggio</option>
-        <option value="Sport">Sport</option>
-        <option value="Altro">Altro</option>
-      </select>
-      <button type="button" id="addBtn">Aggiungi Immagini</button>
-    </form>
-
-    <!-- NUOVA SEZIONE RIMOZIONE -->
-    <div class="remove-section">
-      <h2>Rimuovi Immagini</h2>
-      <div class="remove-list" id="removeList">
-        <!-- Le immagini verranno caricate qui dinamicamente -->
-      </div>
-      <button type="button" id="removeSelectedBtn">Elimina (0) immagini</button>
+    <!-- Upload ImgBB -->
+    <div id="upload-section">
+      <h3>Carica nuova immagine su ImgBB</h3>
+      <input type="file" id="input_img" accept="image/*">
+      <button onclick="uploadToImgBB()">Carica su ImgBB</button>
+      <input type="text" id="img_url" placeholder="URL immagine" readonly>
+      <div class="preview" id="preview"></div>
+      <button id="add-to-gallery-btn" style="display:none;" onclick="addToGallery()">Aggiungi alla Galleria</button>
     </div>
 
-    <h2>Anteprima Immagini</h2>
-    <div class="drag-info">
-      🖱️ <strong>Riorganizza:</strong> Trascina le immagini per cambiarle di posizione. L'ordine verrà salvato automaticamente.
-    </div>
-    <p><em>Le immagini caricate via admin hanno una X rossa per rimuoverle</em></p>
-    <div class="gallery-grid portfolio-gallery" id="adminGallery">
-      <!-- Le immagini verranno caricate dinamicamente qui -->
-    </div>
-
-    <div style="margin-top: 30px; text-align: center;">
-      <button type="button" id="clearAllBtn" style="background: #ff4444; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-        Rimuovi TUTTE le immagini caricate via Admin
-      </button>
-      <button type="button" id="resetOrderBtn" style="background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
-        Ripristina Ordine Originale
-      </button>
-    </div>
-  </section>
+    <!-- Galleria -->
+    <h3>Galleria immagini</h3>
+    <div id="gallery"></div>
+  </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const loginSection = document.getElementById('loginSection');
-      const adminSection = document.getElementById('adminSection');
-      const loginForm = document.getElementById('loginForm');
-      const pwInput = document.getElementById('password');
-      const addBtn = document.getElementById('addBtn');
-      const clearAllBtn = document.getElementById('clearAllBtn');
-      const resetOrderBtn = document.getElementById('resetOrderBtn');
-      const fileInput = document.getElementById('fileInput');
-      const catSelect = document.getElementById('category');
-      const gallery = document.getElementById('adminGallery');
-      
-      // NUOVI ELEMENTI PER RIMOZIONE
-      const removeList = document.getElementById('removeList');
-      const removeSelectedBtn = document.getElementById('removeSelectedBtn');
+    // --- Protezione password ---
+    const PASSWORD = "andreaformisano"; // Cambia con la tua password reale!
+    function checkPassword() {
+      const input = document.getElementById('admin-password').value;
+      if (input === PASSWORD) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('admin-section').style.display = 'block';
+        loadGallery();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    }
 
-      // IMMAGINI STATICHE ORIGINALI
-      const originalStaticImages = [
-        { src: "images/Astrofotografia TRENTO 2.jpg", category: "Astrofotografia", alt: "Astrofotografia 1" },
-        { src: "images/AstrofotografiaLAGOSCAFFAIOLO.jpg", category: "Astrofotografia", alt: "Astrofotografia 2" },
-        { src: "images/islanda-aurora 1.jpg", category: "Viaggio", alt: "Viaggio 1" },
-        { src: "images/DSC01365-2.jpg", category: "Astrofotografia", alt: "Astrofotografia 3" },
-        { src: "images/castori-1.jpg", category: "Sport", alt: "Sport" },
-        { src: "images/islanda-edited-38.jpg", category: "Viaggio", alt: "Viaggio" },
-        { src: "images/DSC06296-High Res export-2.tif", category: "Astrofotografia", alt: "Astrofotografia 4" },
-        { src: "images/islanda-aurora 2.jpg", category: "Viaggio", alt: "Viaggio 2" },
-        { src: "images/islanda-edited-14.jpg", category: "Viaggio", alt: "Viaggio" },
-        { src: "images/islanda-edited-7.jpg", category: "Viaggio", alt: "Viaggio 3" },
-        { src: "images/islanda-edited-5.jpg", category: "Viaggio", alt: "Viaggio 4" },
-        { src: "images/islanda-aurora 3.jpg", category: "Viaggio", alt: "Viaggio 5" },
-        { src: "images/DSC05418.jpg", category: "Sport", alt: "Sport" },
-        { src: "images/castori.jpg", category: "Sport", alt: "Sport" },
-        { src: "images/castori3.jpg", category: "Sport", alt: "Sport" },
-        { src: "images/castori 4.jpg", category: "Sport", alt: "Sport" }
-      ];
+    // --- Upload su ImgBB ---
+    let lastImgBBUrl = "";
 
-      // VARIABILI DRAG AND DROP
-      let draggedElement = null;
-      let draggedIndex = null;
+    async function uploadToImgBB() {
+      const input = document.getElementById('input_img');
+      if (!input.files.length) {
+        alert('Seleziona un\'immagine!');
+        return;
+      }
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append("image", file);
 
-      function loadAllImages() {
-        gallery.innerHTML = '';
-        
-        // Carica ordine personalizzato o usa quello originale
-        const imageOrder = JSON.parse(localStorage.getItem('imageOrder') || 'null');
-        const staticImages = imageOrder ? imageOrder.static : originalStaticImages;
-        const dynamicImages = JSON.parse(localStorage.getItem('customImages') || '[]');
-        
-        // Carica immagini statiche rimosse
-        const removedStatic = JSON.parse(localStorage.getItem('removedStaticImages') || '[]');
-        const filteredStaticImages = staticImages.filter(img => !removedStatic.includes(img.src));
-        
-        // Combina tutte le immagini nell'ordine salvato
-        const allImages = [...filteredStaticImages, ...dynamicImages];
-        
-        allImages.forEach((item, index) => {
-          const div = document.createElement('div');
-          div.className = 'gallery-item';
-          div.dataset.category = item.category;
-          div.dataset.index = index;
-          div.draggable = true;
-          
-          if (item.dataURL) {
-            // Immagine dinamica
-            div.dataset.dynamic = 'true';
-            div.innerHTML = `
-              <div class="drag-handle">⋮⋮</div>
-              <img src="${item.dataURL}" data-full="${item.dataURL}" alt="${item.filename}" loading="lazy">
-              <button class="admin-delete-x" onclick="removeCustomImage(${dynamicImages.indexOf(item)})">×</button>
-            `;
-          } else {
-            // Immagine statica
-            div.dataset.static = 'true';
-            div.dataset.src = item.src;
-            div.innerHTML = `
-              <div class="drag-handle">⋮⋮</div>
-              <img src="${item.src}" data-full="${item.src}" alt="${item.alt}" loading="lazy">
-            `;
-          }
-          
-          gallery.appendChild(div);
+      // API KEY fornita da te
+      const apiKey = "f14894d9791fc8ecc9250eefaa1dc4b1";
+
+      try {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+          method: "POST",
+          body: formData
         });
-
-        setupDragAndDrop();
-        loadRemoveList();
-      }
-
-      function setupDragAndDrop() {
-        const items = gallery.querySelectorAll('.gallery-item');
-        
-        items.forEach((item, index) => {
-          item.addEventListener('dragstart', handleDragStart);
-          item.addEventListener('dragover', handleDragOver);
-          item.addEventListener('dragenter', handleDragEnter);
-          item.addEventListener('dragleave', handleDragLeave);
-          item.addEventListener('drop', handleDrop);
-          item.addEventListener('dragend', handleDragEnd);
-        });
-      }
-
-      function handleDragStart(e) {
-        draggedElement = this;
-        draggedIndex = parseInt(this.dataset.index);
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-      }
-
-      function handleDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-      }
-
-      function handleDragEnter(e) {
-        this.classList.add('drag-over');
-      }
-
-      function handleDragLeave(e) {
-        this.classList.remove('drag-over');
-      }
-
-      function handleDrop(e) {
-        e.preventDefault();
-        this.classList.remove('drag-over');
-        
-        if (draggedElement !== this) {
-          const dropIndex = parseInt(this.dataset.index);
-          reorderImages(draggedIndex, dropIndex);
-        }
-      }
-
-      function handleDragEnd(e) {
-        this.classList.remove('dragging');
-        gallery.querySelectorAll('.gallery-item').forEach(item => {
-          item.classList.remove('drag-over');
-        });
-        draggedElement = null;
-        draggedIndex = null;
-      }
-
-      function reorderImages(fromIndex, toIndex) {
-        // Ottieni ordine corrente
-        const currentOrder = getCurrentImageOrder();
-        
-        // Sposta elemento
-        const movedItem = currentOrder.splice(fromIndex, 1)[0];
-        currentOrder.splice(toIndex, 0, movedItem);
-        
-        // Salva nuovo ordine
-        saveImageOrder(currentOrder);
-        
-        // Ricarica galleria
-        loadAllImages();
-      }
-
-      function getCurrentImageOrder() {
-        const items = gallery.querySelectorAll('.gallery-item');
-        const staticImages = [];
-        const dynamicImages = [];
-        
-        items.forEach(item => {
-          if (item.dataset.static) {
-            const img = item.querySelector('img');
-            staticImages.push({
-              src: item.dataset.src,
-              category: item.dataset.category,
-              alt: img.alt
-            });
-          } else {
-            const img = item.querySelector('img');
-            const customImages = JSON.parse(localStorage.getItem('customImages') || '[]');
-            const matchingImage = customImages.find(ci => ci.dataURL === img.src);
-            if (matchingImage) {
-              dynamicImages.push(matchingImage);
-            }
-          }
-        });
-        
-        return [...staticImages, ...dynamicImages];
-      }
-
-      function saveImageOrder(orderedImages) {
-        const staticImages = orderedImages.filter(img => !img.dataURL);
-        const dynamicImages = orderedImages.filter(img => img.dataURL);
-        
-        localStorage.setItem('imageOrder', JSON.stringify({
-          static: staticImages,
-          timestamp: Date.now()
-        }));
-        
-        // Aggiorna anche l'ordine delle immagini dinamiche
-        localStorage.setItem('customImages', JSON.stringify(dynamicImages));
-      }
-
-      // Funzione globale per rimuovere immagini custom (chiamata dal bottone X)
-      window.removeCustomImage = function(index) {
-        if (confirm('Vuoi rimuovere questa immagine?')) {
-          const images = JSON.parse(localStorage.getItem('customImages') || '[]');
-          images.splice(index, 1);
-          localStorage.setItem('customImages', JSON.stringify(images));
-          loadAllImages();
-        }
-      };
-
-      function loadDynamicImages() {
-        // Questa funzione è mantenuta per compatibilità ma ora usa loadAllImages
-        loadAllImages();
-      }
-
-      // NUOVA FUNZIONE PER CARICARE LA LISTA RIMOZIONE
-      function loadRemoveList() {
-        removeList.innerHTML = '';
-        
-        // Carica immagini dinamiche
-        const dynamicImages = JSON.parse(localStorage.getItem('customImages') || '[]');
-        
-        // Carica SOLO le immagini statiche ancora presenti nel DOM
-        const staticItems = gallery.querySelectorAll('[data-static="true"]');
-        const staticImages = Array.from(staticItems).map(item => ({
-          type: 'static',
-          src: item.dataset.src,
-          filename: item.dataset.src.split('/').pop(),
-          category: item.dataset.category,
-          img: item.querySelector('img').src
-        }));
-
-        const allImages = [
-          ...staticImages,
-          ...dynamicImages.map((item, index) => ({
-            type: 'dynamic',
-            index: index,
-            filename: item.filename,
-            category: item.category,
-            img: item.dataURL
-          }))
-        ];
-        
-        if (allImages.length === 0) {
-          removeList.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Nessuna immagine disponibile</p>';
-          updateRemoveButton();
-          return;
-        }
-
-        allImages.forEach((item, globalIndex) => {
-          const div = document.createElement('div');
-          div.className = 'remove-item';
-          div.innerHTML = `
-            <input type="checkbox" class="remove-checkbox" data-type="${item.type}" data-index="${item.index || ''}" data-src="${item.src || ''}">
-            <img src="${item.img}" alt="${item.filename}">
-            <div class="remove-info">
-              <div class="remove-filename">${item.filename}</div>
-              <div class="remove-category">${item.category}</div>
-              <div class="remove-type">${item.type === 'static' ? 'Foto originale' : 'Caricata via admin'}</div>
-            </div>
-          `;
-          
-          // Click su tutta la riga seleziona/deseleziona
-          div.addEventListener('click', function(e) {
-            if (e.target.type !== 'checkbox') {
-              const checkbox = div.querySelector('.remove-checkbox');
-              checkbox.checked = !checkbox.checked;
-              updateRemoveButton();
-            }
-          });
-
-          removeList.appendChild(div);
-        });
-
-        // Aggiungi listener alle checkbox
-        document.querySelectorAll('.remove-checkbox').forEach(cb => {
-          cb.addEventListener('change', updateRemoveButton);
-        });
-
-        updateRemoveButton();
-      }
-
-      // FUNZIONE PER AGGIORNARE IL PULSANTE RIMOZIONE
-      function updateRemoveButton() {
-        const checkboxes = document.querySelectorAll('.remove-checkbox:checked');
-        const count = checkboxes.length;
-        
-        removeSelectedBtn.textContent = `Elimina (${count}) immagini`;
-        
-        if (count > 0) {
-          removeSelectedBtn.classList.add('active');
-          removeSelectedBtn.disabled = false;
+        const data = await response.json();
+        if (data.success) {
+          document.getElementById('img_url').value = data.data.url;
+          document.getElementById('preview').innerHTML = `<img src="${data.data.url}" alt="Preview">`;
+          lastImgBBUrl = data.data.url;
+          document.getElementById('add-to-gallery-btn').style.display = "inline-block";
         } else {
-          removeSelectedBtn.classList.remove('active');
-          removeSelectedBtn.disabled = true;
+          alert("Errore nel caricamento: " + data.error.message);
         }
-
-        // Evidenzia le righe selezionate
-        document.querySelectorAll('.remove-item').forEach(item => {
-          const checkbox = item.querySelector('.remove-checkbox');
-          if (checkbox && checkbox.checked) {
-            item.classList.add('selected');
-          } else {
-            item.classList.remove('selected');
-          }
-        });
+      } catch (error) {
+        alert("Errore di rete o API: " + error.message);
       }
+    }
 
-      // GESTORE CLICK PULSANTE RIMOZIONE
-      removeSelectedBtn.addEventListener('click', () => {
-        const checkboxes = document.querySelectorAll('.remove-checkbox:checked');
-        
-        if (checkboxes.length > 0) {
-          if (confirm(`Vuoi eliminare ${checkboxes.length} immagini selezionate?`)) {
-            const dynamicToRemove = [];
-            const staticToRemove = [];
-            
-            checkboxes.forEach(cb => {
-              if (cb.dataset.type === 'dynamic') {
-                dynamicToRemove.push(parseInt(cb.dataset.index));
-              } else {
-                staticToRemove.push(cb.dataset.src);
-              }
-            });
-            
-            // Rimuovi immagini dinamiche
-            if (dynamicToRemove.length > 0) {
-              const stored = JSON.parse(localStorage.getItem('customImages') || '[]');
-              dynamicToRemove.sort((a, b) => b - a).forEach(index => {
-                stored.splice(index, 1);
-              });
-              localStorage.setItem('customImages', JSON.stringify(stored));
-            }
-            
-            // Rimuovi immagini statiche (salva lista rimosse)
-            if (staticToRemove.length > 0) {
-              const removedStatic = JSON.parse(localStorage.getItem('removedStaticImages') || '[]');
-              staticToRemove.forEach(src => {
-                if (!removedStatic.includes(src)) {
-                  removedStatic.push(src);
-                }
-              });
-              localStorage.setItem('removedStaticImages', JSON.stringify(removedStatic));
-            }
-            
-            loadAllImages();
+    // --- Aggiungi alla galleria ---
+    function addToGallery() {
+      if (!lastImgBBUrl) return;
+      const gallery = JSON.parse(localStorage.getItem('galleryImgs') || '[]');
+      gallery.push(lastImgBBUrl);
+      localStorage.setItem('galleryImgs', JSON.stringify(gallery));
+      lastImgBBUrl = "";
+      document.getElementById('img_url').value = "";
+      document.getElementById('preview').innerHTML = "";
+      document.getElementById('add-to-gallery-btn').style.display = "none";
+      loadGallery();
+    }
+
+    // --- Carica la galleria ---
+    function loadGallery() {
+      const gallery = JSON.parse(localStorage.getItem('galleryImgs') || '[]');
+      const galleryDiv = document.getElementById('gallery');
+      galleryDiv.innerHTML = "";
+      gallery.forEach((url, idx) => {
+        const div = document.createElement('div');
+        div.className = 'img-item';
+        div.draggable = true;
+        div.ondragstart = e => { e.dataTransfer.setData('text/plain', idx); };
+        div.ondragover = e => { e.preventDefault(); div.classList.add('drag-over'); };
+        div.ondragleave = () => { div.classList.remove('drag-over'); };
+        div.ondrop = e => {
+          e.preventDefault();
+          div.classList.remove('drag-over');
+          const fromIdx = +e.dataTransfer.getData('text/plain');
+          if (fromIdx !== idx) {
+            const gallery = JSON.parse(localStorage.getItem('galleryImgs') || '[]');
+            const [moved] = gallery.splice(fromIdx, 1);
+            gallery.splice(idx, 0, moved);
+            localStorage.setItem('galleryImgs', JSON.stringify(gallery));
+            loadGallery();
           }
-        }
+        };
+        div.innerHTML = `
+          <img src="${url}" alt="img">
+          <button class="remove-btn" onclick="removeImg(${idx})">&times;</button>
+        `;
+        galleryDiv.appendChild(div);
       });
+    }
 
-      // RIPRISTINA ORDINE ORIGINALE
-      resetOrderBtn.addEventListener('click', () => {
-        if (confirm('Vuoi ripristinare l\'ordine originale delle immagini?')) {
-          localStorage.removeItem('imageOrder');
-          loadAllImages();
-          alert('Ordine originale ripristinato!');
-        }
-      });
-
-      // Rimuovi tutte le immagini dinamiche
-      clearAllBtn.addEventListener('click', () => {
-        if (confirm('Vuoi rimuovere TUTTE le immagini caricate via Admin?')) {
-          localStorage.removeItem('customImages');
-          loadAllImages();
-          alert('Tutte le immagini dinamiche rimosse!');
-        }
-      });
-
-      loginForm.addEventListener('submit', e => {
-        e.preventDefault();
-        if (pwInput.value === 'andreaformisano') {
-          loginSection.style.display = 'none';
-          adminSection.style.display = 'block';
-          loadAllImages();
-        } else {
-          alert('Password errata');
-        }
-      });
-
-      addBtn.addEventListener('click', () => {
-        const files = Array.from(fileInput.files);
-        if (!files.length) { alert('Seleziona almeno un file'); return; }
-
-        const stored = JSON.parse(localStorage.getItem('customImages') || '[]');
-        let loaded = 0;
-
-        files.forEach(file => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const img = new Image();
-            img.src = reader.result;
-            img.onload = () => {
-              let w = img.width, h = img.height;
-              const MAX_DIM = 1200;
-              if (w > h && w > MAX_DIM) { h = h * MAX_DIM / w; w = MAX_DIM; }
-              else if (h > w && h > MAX_DIM) { w = w * MAX_DIM / h; h = MAX_DIM; }
-
-              const canvas = document.createElement('canvas');
-              canvas.width = w;
-              canvas.height = h;
-              canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-              stored.push({
-                filename: file.name,
-                dataURL: canvas.toDataURL('image/jpeg', 1),
-                category: catSelect.value
-              });
-
-              loaded++;
-              if (loaded === files.length) {
-                localStorage.setItem('customImages', JSON.stringify(stored));
-                alert('Immagini aggiunte!');
-                fileInput.value = '';
-                catSelect.selectedIndex = 0;
-                loadAllImages();
-              }
-            };
-          };
-          reader.readAsDataURL(file);
-        });
-      });
-    });
+    // --- Rimuovi immagine ---
+    function removeImg(idx) {
+      const gallery = JSON.parse(localStorage.getItem('galleryImgs') || '[]');
+      gallery.splice(idx, 1);
+      localStorage.setItem('galleryImgs', JSON.stringify(gallery));
+      loadGallery();
+    }
   </script>
 </body>
 </html>

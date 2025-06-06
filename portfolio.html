@@ -55,7 +55,7 @@
       </div>
 
       <div class="gallery-grid portfolio-gallery" id="portfolioGallery">
-        <!-- SOLO IMMAGINI DINAMICHE CARICATE DA ADMIN -->
+        <!-- Immagini dinamiche caricate da admin -->
       </div>
     </section>
   </main>
@@ -82,43 +82,52 @@
       const lbImg = document.getElementById('lightbox-img');
       const lbCap = document.getElementById('lightbox-caption');
 
-      // *** CARICA IMMAGINI DINAMICHE DA ADMIN ***
-      function loadDynamicImages() {
-        // Rimuovi immagini dinamiche precedenti
-        const dynamicItems = gallery.querySelectorAll('[data-dynamic="true"]');
-        dynamicItems.forEach(item => item.remove());
+      // URL del file JSON su GitHub (sostituisci con il tuo)
+      const GITHUB_JSON_URL = 'https://raw.githubusercontent.com/TUO_USERNAME/TUO_REPO/main/gallery.json';
 
-        // Carica immagini da localStorage
-        const stored = JSON.parse(localStorage.getItem('customImages') || '[]');
-        
-        stored.forEach(item => {
+      // *** CARICA IMMAGINI DINAMICHE ***
+      async function loadDynamicImages() {
+        try {
+          // Prova a caricare da GitHub
+          const response = await fetch(GITHUB_JSON_URL);
+          if(response.ok) {
+            const remoteImages = await response.json();
+            renderDynamicImages(remoteImages);
+            return;
+          }
+        } catch (error) {
+          console.log('Caricamento da GitHub fallito, uso localStorage');
+        }
+
+        // Fallback su localStorage
+        const localImages = JSON.parse(localStorage.getItem('customImages') || '[]');
+        renderDynamicImages(localImages);
+      }
+
+      // *** RENDER IMMAGINI DINAMICHE ***
+      function renderDynamicImages(images) {
+        images.forEach(item => {
           const div = document.createElement('div');
           div.className = 'gallery-item';
           div.dataset.category = item.category;
-          div.dataset.dynamic = 'true';
 
           const img = document.createElement('img');
           img.src = item.dataURL;
-          img.dataset.full = item.dataURL;
           img.alt = item.filename;
+          img.dataset.full = item.dataURL;
           img.loading = 'lazy';
 
           div.appendChild(img);
           gallery.appendChild(div);
         });
 
-        // Riattacca i listener dopo aver aggiunto nuove immagini
+        // Riattacca i listener per lightbox
         attachImageListeners();
       }
 
       // *** ATTACCA LISTENER ALLE IMMAGINI ***
       function attachImageListeners() {
-        const galleryImgs = document.querySelectorAll('.gallery-item img');
-        
-        galleryImgs.forEach(img => {
-          // Rimuovi listener esistenti per evitare duplicati
-          img.removeEventListener('click', handleImageClick);
-          // Aggiungi listener
+        document.querySelectorAll('.gallery-item img').forEach(img => {
           img.addEventListener('click', handleImageClick);
         });
       }
@@ -159,8 +168,7 @@
           btn.classList.add('active');
           const filter = btn.dataset.filter;
           
-          const galleryItems = document.querySelectorAll('.gallery-item');
-          galleryItems.forEach(item => {
+          document.querySelectorAll('.gallery-item').forEach(item => {
             item.style.display = (filter === 'all' || item.dataset.category === filter) ? 'block' : 'none';
           });
         });
@@ -173,7 +181,7 @@
       });
 
       // *** INIZIALIZZA ***
-      loadDynamicImages(); // Carica immagini da admin
+      loadDynamicImages();
     });
   </script>
 </body>
